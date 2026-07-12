@@ -378,7 +378,7 @@ select.fsel:focus{outline:none;border-color:var(--brand)}
 /* ════════════ MODAL (Add/Edit Idea) ════════════ */
 .overlay{display:none;position:fixed;inset:0;background:rgba(5,7,12,.78);z-index:300;align-items:center;justify-content:center;padding:2vh 2vw;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .overlay.open{display:flex}
-.modal{width:96vw;max-width:1240px;height:93vh;background:var(--s1);border:1px solid var(--b2);border-radius:var(--r-xl);display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--sh-pop)}
+.modal{width:96vw;max-width:1240px;height:auto;min-height:min(560px,86vh);max-height:93vh;background:var(--s1);border:1px solid var(--b2);border-radius:var(--r-xl);display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--sh-pop)}
 .modal-hd{display:flex;align-items:center;gap:10px;padding:20px 28px 16px;border-bottom:1px solid var(--b1);flex-shrink:0;background:var(--surface)}
 .modal-hd-info{flex:1;min-width:0}
 .modal-title{font-size:19px;font-weight:700;letter-spacing:-.03em;margin-bottom:2px}
@@ -434,6 +434,8 @@ select.fsel:focus{outline:none;border-color:var(--brand)}
 .fsel-inp{width:100%;height:42px;padding:0 14px;background:var(--s2);border:1.5px solid var(--b1);border-radius:10px;color:var(--t1);font-family:var(--sans);font-size:14px;cursor:pointer;transition:all .2s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237683a0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
 .fsel-inp:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-d)}
 .fta{width:100%;padding:12px 14px;background:var(--s2);border:1.5px solid var(--b1);border-radius:10px;color:var(--t1);font-family:var(--sans);font-size:13px;resize:vertical;line-height:1.7;transition:all .2s}
+.dup-warn{margin-top:7px;padding:7px 11px;background:var(--ad);border:1px solid var(--ab);border-radius:7px;color:var(--at);font-size:11.5px;line-height:1.5}
+.dup-warn b{color:var(--amber)}
 .fta:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-d)}
 .fi::placeholder,.fta::placeholder{color:var(--t4)}
 .tp{display:none;align-items:center;gap:5px;font-family:var(--mono);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-top:6px;width:fit-content}
@@ -848,7 +850,13 @@ select.fsel:focus{outline:none;border-color:var(--brand)}
 .export-body{flex:1;overflow-y:auto;padding:14px 18px}
 .export-ft{padding:14px 24px;border-top:1px solid var(--b1);display:flex;gap:8px;background:var(--s2);flex-wrap:wrap}
 .export-preview{background:var(--bg);border:1px solid var(--b1);border-radius:10px;padding:16px;font-family:var(--mono);font-size:12px;line-height:1.8;color:var(--t3);white-space:pre-wrap;word-break:break-word;max-height:380px;overflow-y:auto;margin-top:12px;width:100%;resize:none}
-.export-opts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+.export-opts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.export-sections{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.export-sec-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;border:1.5px solid var(--b1);background:var(--s2);color:var(--t3);font-size:11.5px;font-weight:600;cursor:pointer;transition:all .13s;user-select:none}
+.export-sec-chip:hover{border-color:var(--b2);color:var(--t2)}
+.export-sec-chip.on{border-color:var(--green);background:var(--gd);color:var(--gt)}
+.export-sec-chip .esc-tick{width:13px;height:13px;border-radius:4px;border:1.5px solid var(--b3);display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:transparent}
+.export-sec-chip.on .esc-tick{border-color:var(--green);background:var(--green);color:#07130d}
 .export-opt{background:var(--s2);border:1.5px solid var(--b1);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .15s;text-align:center}
 .export-opt:hover{border-color:var(--b2);background:var(--s3)}
 .export-opt.active{border-color:var(--brand);background:var(--brand-d);box-shadow:0 0 0 1px var(--brand) inset}
@@ -1284,6 +1292,7 @@ body,.app{background:var(--bg)}
           <option value="za">Z–A</option><option value="sv">Search Vol ↓</option>
           <option value="price">Price ↓</option><option value="edited">Last edited</option>
         </select>
+        <button class="btn sm" id="exportBtn" onclick="openExport('all')" style="background:var(--bd);border-color:var(--bb);color:var(--blue)" title="Export ideas to copy into Google Docs — pick All, the good ones, Top 5/10, etc.">📤 Export</button>
         <button class="btn sm ghost" id="bulkToggleBtn" onclick="toggleBulkMode()">☰ Select</button>
         <div class="bulk-bar" id="bulkBar">
           <span class="bulk-count" id="bulkCount">0 selected</span>
@@ -1325,7 +1334,7 @@ body,.app{background:var(--bg)}
           <option value="oldest">Oldest first</option><option value="az">A–Z</option>
         </select>
       </div>
-      <div class="rank-head"><div>#</div><div>Product</div><div>Score</div><div style="text-align:right">Market</div></div>
+      <div class="rank-head"><div>#</div><div>Product</div><div style="text-align:right">Market</div><div></div><div style="text-align:right">Score</div></div>
       <div id="rankList"></div>
       <div class="empty" id="rankEmpty" style="display:none">
         <div class="empty-ico" style="font-family:var(--mono)">—</div>
@@ -1451,8 +1460,10 @@ body,.app{background:var(--bg)}
     </div>
     <div class="modal-ft">
       <button class="btn primary" onclick="saveIdea()">✓ Save Idea</button>
+      <button class="btn" onclick="saveDraftIdea()" title="Save now with just a name — fill in the rest later">💾 Save draft</button>
       <button class="btn ghost" onclick="closeModal()">✕ Close</button>
       <button class="btn success sm" id="promoteBtn" style="display:none" onclick="promoteFromModal()">→ Move to Pipeline</button>
+      <button class="btn sm" id="exportIdeaBtn" style="display:none" onclick="exportSingle(editId)" title="Export just this idea">📤 Export</button>
       <button class="btn danger sm" id="delBtn" style="display:none" onclick="askDelete()">Delete</button>
       <span class="kbd-hint" style="margin-left:auto">
         <span><span class="kbd">Tab</span> next</span><span><span class="kbd">←</span><span class="kbd">→</span> tabs</span>
@@ -1520,16 +1531,27 @@ body,.app{background:var(--bg)}
 <!-- EXPORT MODAL -->
 <div class="overlay" id="exportOverlay">
   <div class="export-modal">
-    <div class="export-hd"><h3>Export Ideas</h3><span class="copied-flash" id="copiedFlash">Copied!</span><button class="btn sm ghost" onclick="closeExport()">Close</button></div>
+    <div class="export-hd"><h3 id="exportTitle">Export Ideas</h3><span class="copied-flash" id="copiedFlash">Copied!</span><button class="btn sm ghost" onclick="closeExport()">Close</button></div>
     <div class="export-body">
-      <div style="font-size:12px;color:var(--t3);margin-bottom:12px">Select one or more categories — they combine automatically. Then copy and paste into Google Docs.</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px">
+        <div style="font-size:12px;color:var(--t3)">Pick which ideas to export — categories combine automatically.</div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="btn xs ghost" onclick="exportSelectAllBands()">Select all</button>
+          <button class="btn xs ghost" onclick="exportClearBands()">Clear</button>
+        </div>
+      </div>
       <div class="export-opts" id="exportOpts"></div>
-      <div style="font-size:12px;font-weight:600;color:var(--t2);margin-bottom:6px">Preview:</div>
+      <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin:4px 0 7px">What to include</div>
+      <div class="export-sections" id="exportSections"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="font-size:12px;font-weight:600;color:var(--t2)">Preview <span id="exportCountLbl" style="color:var(--t3);font-weight:400"></span></div>
+      </div>
       <textarea class="export-preview" id="exportPreview" readonly>Select an option above…</textarea>
     </div>
     <div class="export-ft">
-      <button class="btn primary" onclick="selectExportAll()">Select all text</button>
-      <button class="btn" onclick="copyExport()">Copy to clipboard</button>
+      <button class="btn primary" onclick="copyExport()">📋 Copy to clipboard</button>
+      <button class="btn" onclick="downloadExport()">⬇ Download .txt</button>
+      <button class="btn ghost" onclick="selectExportAll()">Select text</button>
       <button class="btn ghost" onclick="closeExport()">Close</button>
     </div>
   </div>
@@ -1541,6 +1563,9 @@ body,.app{background:var(--bg)}
 const DEF={
   sourcing:['Amazon Search','TikTok','Alibaba','Jungle Scout','Helium10','Keepa','Storefront Stalking','Retail Inspiration','Competitor Research','DHgate','1688','Trade Show','UK Wholesale','eBay / OA','Other'],
   statuses:['launch','good','potential','revisit','weak','holding'],
+  amazonDomain:'amazon.co.uk',
+  exportOpts:{header:true,found:true,market:true,asins:true,links:true,proscons:true,tocheck:true,qnotes:true,mytake:true},
+  weights:{sv:20,ctx:25,price:10},
   thresholds:{sv_green:3000,sv_amber:1000,price_green:30,price_amber:15,price_floor:10,tcs_green:500,tcs_amber:700,nc_green:10,nc_amber:20},
   checklist:[
     {id:'reviews',q:'Avg competitor reviews under 500?',h:'Under 500 = more room to take market share. Over 500 = very hard to break in.',inv:false,pts:10,importance:'critical',on:true},
@@ -1589,26 +1614,25 @@ setInterval(updateLastSaved, 60000);
 // ── Sync settings from DEF (same logic as before) ──
 function syncSettings(saved) {
   if (!saved) return JSON.parse(JSON.stringify(DEF));
-  const defCl = DEF.checklist;
-  if (!saved.checklist) {
-    saved.checklist = JSON.parse(JSON.stringify(defCl));
+  // Respect the user's checklist completely — their edits, added questions and
+  // deleted questions all stick. Only seed the defaults the very first time
+  // (when there is no checklist yet). This is what makes Settings edits durable.
+  if (!saved.checklist || !saved.checklist.length) {
+    saved.checklist = JSON.parse(JSON.stringify(DEF.checklist));
   } else {
-    defCl.forEach(defItem => {
-      const existing = saved.checklist.find(i => i.id === defItem.id);
-      if (existing) {
-        existing.importance = defItem.importance;
-        existing.pts = defItem.pts;
-        existing.inv = defItem.inv;
-        const origDef = defCl.find(d => d.id === defItem.id);
-        if (origDef && existing.q === origDef.q) existing.q = defItem.q;
-        if (origDef && existing.h === origDef.h) existing.h = defItem.h;
-      } else {
-        saved.checklist.push(JSON.parse(JSON.stringify(defItem)));
-      }
+    // Make sure every saved item still has the fields the app relies on.
+    saved.checklist.forEach(it => {
+      if (it.on === undefined) it.on = true;
+      if (it.importance === undefined) it.importance = 'medium';
+      if (it.pts === undefined) it.pts = 5;
+      if (!it.id) it.id = 'q_' + Math.random().toString(36).slice(2, 8);
     });
   }
   if (!saved.sourcing) saved.sourcing = DEF.sourcing.slice();
   if (!saved.thresholds) saved.thresholds = { ...DEF.thresholds };
+  if (!saved.amazonDomain) saved.amazonDomain = DEF.amazonDomain;
+  saved.exportOpts = { ...DEF.exportOpts, ...(saved.exportOpts || {}) };
+  saved.weights = { ...DEF.weights, ...(saved.weights || {}) };
   return saved;
 }
 
@@ -1969,6 +1993,7 @@ function showFlash(m){const e=document.getElementById('flash');if(!e)return;e.te
 // ══════════════════
 function score(idea){
   const T=settings.thresholds;
+  const W=settings.weights||DEF.weights;
   let pts=0,max=0,why=[],answered=0;
 
   const svV=parseFloat(idea.sv)||0;
@@ -1976,8 +2001,8 @@ function score(idea){
   const ncV=parseFloat(idea.ncomp)||0;
   const prV=parseFloat(idea.price)||0;
 
-  // ── STAGE 1: Search Volume — granular 1-10 scale (max 20pts) ──────
-  max+=20;
+  // ── STAGE 1: Search Volume — granular 1-10 scale (weight-scaled) ──────
+  max+=W.sv;
   let svPts=0, svC='n';
   if(svV>0){
     answered++;
@@ -1992,12 +2017,13 @@ function score(idea){
     else if(svV>=600)  {svPts=4; svC='r';}
     else               {svPts=2; svC='r';}
   }
-  pts+=svPts;
-  const bd={sv:{pts:svPts,c:svC,max:20}};
+  const svScaled=Math.round(svPts*W.sv/20);
+  pts+=svScaled;
+  const bd={sv:{pts:svScaled,c:svC,max:W.sv}};
 
-  // ── STAGE 2: SV in context — SV + Comp count + Comp sales (max 25pts) ──
+  // ── STAGE 2: SV in context — SV + Comp count + Comp sales (weight-scaled) ──
   // How winnable is the demand? Score based on the combination.
-  max+=25;
+  max+=W.ctx;
   let ctxPts=0, ctxC='n';
   const hasSv=svV>0, hasTcs=tcsV>0, hasNc=ncV>0;
   if(hasSv&&(hasTcs||hasNc)){
@@ -2031,7 +2057,7 @@ function score(idea){
     }
     // colour based on result
     ctxC=ctxPts>=18?'g':ctxPts>=10?'a':'r';
-    pts+=ctxPts;
+    pts+=Math.round(ctxPts*W.ctx/25);
     // why signals
     if(svTier<=1&&totalPressure<=1)why.push('Low SV but low competition — viable');
     if(svTier>=2&&totalPressure>=3)why.push('High volume but saturated market');
@@ -2041,14 +2067,14 @@ function score(idea){
     // only SV, no comp data yet
     ctxPts=Math.round(svPts*0.5);
     ctxC=svC;
-    pts+=ctxPts;
+    pts+=Math.round(ctxPts*W.ctx/25);
   }
-  bd.ctx={pts:ctxPts,c:ctxC,max:25};
+  bd.ctx={pts:Math.round(ctxPts*W.ctx/25),c:ctxC,max:W.ctx};
   bd.tcs={pts:0,c:hasTcs?ctxC:'n',max:0}; // for breakdown display
   bd.ncomp={pts:0,c:hasNc?ctxC:'n',max:0};
 
-  // ── PRICE — standalone (max 10pts) ──────────────────────────────
-  max+=10;
+  // ── PRICE — standalone (weight-scaled) ──────────────────────────────
+  max+=W.price;
   let prPts=0,prC='n';
   if(prV>0){
     answered++;
@@ -2059,8 +2085,9 @@ function score(idea){
     else if(prV>=10){prPts=2; prC='r';}
     else            {prPts=0; prC='r';}
   }
-  pts+=prPts;
-  bd.price={pts:prPts,c:prC,max:10};
+  const prScaled=Math.round(prPts*W.price/10);
+  pts+=prScaled;
+  bd.price={pts:prScaled,c:prC,max:W.price};
   if(prC==='g')why.push('Good price point');
 
   // ── CHECKLIST yes/no items — driven by settings (max varies) ────
@@ -2401,7 +2428,7 @@ function renderDash(){
     const isIncomplete=allMissing.length>0;
     // ASIN link chips
     const asinChips=validAsins.slice(0,4).map(function(a){
-      var url='https://www.amazon.co.uk/dp/'+a.asin.trim().toUpperCase()+'?th=1';
+      var url=amzUrlFor(a.asin);
       var lbl=a.asin.trim().toUpperCase().substring(0,10);
       var note=a.note?' — '+a.note:'';
       return '<a href="'+url+'" target="_blank" class="ic-asin-link" onclick="event.stopPropagation()" title="'+a.asin.trim()+note+'">'+lbl+'</a>';
@@ -2459,6 +2486,7 @@ function renderDash(){
           ?'<button class="ic-action-btn pipe" onclick="event.stopPropagation();nav(&quot;pipeline&quot;)">In Pipeline →</button>'
           :'<button class="ic-action-btn pipe" onclick="event.stopPropagation();moveToPipeline('+n.id+')">→ Pipeline</button>'
         )
+        +'<button class="ic-action-btn" onclick="event.stopPropagation();exportSingle('+n.id+')" title="Export just this idea">📤 Export</button>'
         +'<button class="ic-action-btn del" onclick="event.stopPropagation();delById('+n.id+')">Delete</button>'
       +'</div>'
     +'</div>';
@@ -2561,16 +2589,18 @@ function renderRank(){
 
     return`<div class="rank-item ${st}" onclick="openModal(${n.id})">
       <div class="ri-pos ${posClass}">${i+1}</div>
-      <div style="flex:1;min-width:0">
+      <div class="ri-main">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
           <div class="ri-name">${esc(n.name||'Unnamed')}</div>
         </div>
         <div class="ri-why">${sc.why.slice(0,4).join(' · ')||'—'}</div>
       </div>
-      <div style="display:flex;gap:10px;flex-shrink:0;align-items:center">
+      <div class="ri-metrics">
         ${n.sv?`<div class="ri-m">SV <b>${!isNaN(parseFloat(n.sv))?Number(parseFloat(n.sv)).toLocaleString():'—'}</b></div>`:''}
         ${n.price?`<div class="ri-m">£<b>${n.price}</b></div>`:''}
         ${n.ncomp?`<div class="ri-m"><b>${n.ncomp}</b> comp</div>`:''}
+      </div>
+      <div class="ri-act">
         <button class="btn xs success" onclick="event.stopPropagation();moveToPipeline(${n.id});renderRank();renderPipeline();showFlash('Moved to Pipeline →')" style="white-space:nowrap">→ Pipeline</button>
       </div>
       <div class="ri-bar">
@@ -2599,10 +2629,22 @@ function openModal(id){
     document.getElementById('modalTitle').textContent='Add Idea';
   }
   document.getElementById('delBtn').style.display=id?'inline-flex':'none';
+  var expBtn=document.getElementById('exportIdeaBtn');if(expBtn)expBtn.style.display=id?'inline-flex':'none';
   buildModal(data);
   switchTab(0);
   document.getElementById('overlay').classList.add('open');
-  setTimeout(()=>{const f=document.getElementById('f_name');if(f){f.focus();f.select&&f.select();}},120);
+  setTimeout(()=>{
+    const f=document.getElementById('f_name');
+    if(!f)return;
+    if(id){
+      // EXISTING idea — focus but DON'T select-all. Selecting the whole name
+      // meant one stray keystroke wiped it (that's the "saved as done" bug).
+      const v=f.value;f.focus();try{f.setSelectionRange(v.length,v.length);}catch(e){}
+    } else {
+      // New idea — the field is empty, safe to focus + select.
+      f.focus();f.select&&f.select();
+    }
+  },120);
 }
 function tryDraft(){
   try{
@@ -2626,7 +2668,7 @@ function buildModal(n){
     <div class="sec-hd">Idea Details</div>
     <div class="sr">
       <div class="sr-lbl"><div class="sr-lbl-main">Idea name <span style="color:var(--red)">*</span></div><div class="sr-hint">Give this sourcing idea a clear descriptive name</div></div>
-      <div class="sr-val"><input class="fi" id="f_name" type="text" value="${esc(n.name||'')}" placeholder="e.g. Bamboo Chopping Board" oninput="liveUpdate(true)"></div>
+      <div class="sr-val"><input class="fi" id="f_name" type="text" value="${esc(n.name||'')}" placeholder="e.g. Bamboo Chopping Board" oninput="liveUpdate(true);checkDupName()"><div id="dupWarn" class="dup-warn" style="display:none"></div></div>
     </div>
     <div class="sr">
       <div class="sr-lbl"><div class="sr-lbl-main">Sourcing method</div><div class="sr-hint">How did you find this idea?</div></div>
@@ -2716,7 +2758,7 @@ function buildModal(n){
   document.getElementById('tab-3').innerHTML=`
     <div class="sec-hd">Notes &amp; Thoughts <span style="color:var(--red);font-size:11px;margin-left:4px">required</span></div>
     <p style="font-size:13px;color:var(--t2);margin-bottom:12px;line-height:1.6">Your thoughts on the opportunity, concerns, improvement ideas, review findings, supplier leads — everything in one place.</p>
-    <textarea class="fta" id="f_myThoughts" style="min-height:420px;width:100%" placeholder="Why do you like this idea? What is the opportunity? What are your concerns? What did you find in the reviews? Why do you think it can work? Dump everything here...">${esc(n.myThoughts||n.notes||'')}</textarea>
+    <textarea class="fta" id="f_myThoughts" style="flex:1;min-height:240px;width:100%" placeholder="Why do you like this idea? What is the opportunity? What are your concerns? What did you find in the reviews? Why do you think it can work? Dump everything here...">${esc(n.myThoughts||n.notes||'')}</textarea>
     <input type="hidden" id="f_notes" value="">
   `;
   renderAsinList();
@@ -2787,7 +2829,7 @@ function liveUpdate(fromUser){
   const ovFilled=overviewFields.filter(id=>{const e=document.getElementById(id);return e&&e.value;}).length+(document.getElementById('f_name')?.value?1:0);
   const clIds=(settings.checklist||DEF.checklist).filter(i=>i.on!==false).map(i=>i.id);
   const clFilled=clIds.filter(id=>{const e=document.getElementById('f_'+id);return e&&e.value;}).length;
-  const noteFilled=((document.getElementById('f_notes')?.value||'').trim().length>10&&(document.getElementById('f_myThoughts')?.value||'').trim().length>20)?1:0;
+  const noteFilled=((document.getElementById('f_myThoughts')?.value||'').trim().length>20)?1:0;
   setDot(0,ovFilled,6);setDot(1,clFilled,9);setDot(3,noteFilled,1);
   const asinDot=document.getElementById('dot-2');
   if(asinDot){const hasA=tempAsins.filter(a=>a.asin&&a.asin.trim()).length>0;asinDot.className=hasA?'tab-dot done':'tab-dot asin-missing';}
@@ -2825,29 +2867,45 @@ function switchTab(idx){
 
 function readForm(){
   const g=id=>{const e=document.getElementById(id);return e?e.value:''};
-  return{
+  const prev=editId?ideas.find(x=>x.id===editId):null;
+  const out={
     id:editId||(Date.now()+Math.floor(Math.random()*10000)),
-    createdAt:editId?(ideas.find(x=>x.id===editId)?.createdAt||Date.now()):Date.now(),
+    createdAt:editId?(prev?.createdAt||Date.now()):Date.now(),
     editedAt:Date.now(),
     name:g('f_name'),sourcing:cddGetVal('sourcing')||g('f_sourcing'),status:'',
     asins:JSON.parse(JSON.stringify(tempAsins)),
     sv:g('f_sv'),price:g('f_price'),tcs:g('f_tcs'),ncomp:g('f_ncomp'),ncomp_note:g('f_ncomp_note'),
-    reviews:g('f_reviews'),improve:g('f_improve'),improve_note:g('f_improve_note'),
-    listing:g('f_listing'),tiktok:g('f_tiktok'),tiktokSales:g('f_tiktokSales'),
-    amzsell:g('f_amzsell'),chinese:g('f_chinese'),ads:g('f_ads'),comply:g('f_comply'),better:g('f_better'),
+    tiktokSales:g('f_tiktokSales'),
     myThoughts:g('f_myThoughts'),
     notes:g('f_myThoughts'),
-    scoreHistory:editId?(ideas.find(x=>x.id===editId)?.scoreHistory||[]):[],
+    scoreHistory:editId?(prev?.scoreHistory||[]):[],
   };
+  // Read every checklist answer dynamically — this covers the built-in
+  // questions AND any custom ones the user adds in Settings.
+  (settings.checklist||DEF.checklist).forEach(item=>{
+    if(!item||!item.id)return;
+    out[item.id]=g('f_'+item.id);
+    // capture a per-question note whenever that question has one enabled
+    if(item.note){
+      const nv=g('f_'+item.id+'_note');
+      if(nv!=='')out[item.id+'_note']=nv;
+      else if(prev&&prev[item.id+'_note'])out[item.id+'_note']=prev[item.id+'_note'];
+    }
+  });
+  return out;
 }
 
-function saveIdea(){
+function saveDraftIdea(){return saveIdea(true);}
+function saveIdea(force){
   const data=readForm();
   if(!data.name.trim()){
     switchTab(0);
     setTimeout(()=>{const f=document.getElementById('f_name');if(f){f.classList.add('missing');f.focus();setTimeout(()=>f.classList.remove('missing'),2000);}},100);
+    showFlash('Give the idea a name first');
     return;
   }
+  // Draft save: name is the only requirement — skip the rest so quick ideas can be captured.
+  if(force){ finishSaveIdea(data); return; }
   if(!data.sourcing||!data.sourcing.trim()){
     switchTab(0);
     setTimeout(()=>{
@@ -2893,6 +2951,10 @@ function saveIdea(){
     setTimeout(()=>{missingCl.forEach(item=>{const cli=document.getElementById('cli-'+item.id);if(cli){cli.style.background='rgba(255,79,79,.08)';cli.style.borderRadius='8px';setTimeout(()=>cli.style.background='',2500);}});},100);
     showFlash('Answer required: '+missingCl.slice(0,2).map(i=>i.q.substring(0,20)+'…').join(', ')+(missingCl.length>2?' +'+(missingCl.length-2)+' more':''));return;
   }
+  finishSaveIdea(data);
+}
+
+function finishSaveIdea(data){
   const sc=score(data);
   data.scoreHistory=data.scoreHistory||[];
   const last=data.scoreHistory[data.scoreHistory.length-1];
@@ -2917,14 +2979,15 @@ function saveIdea(){
     ideas.unshift(data);
   }
   persist();closeModal();renderDash();
+  try{localStorage.removeItem('pls_draft');}catch(e){}
 }
 
 function renderAsinList(){
   const el=document.getElementById('asinList');if(!el)return;
   el.innerHTML=tempAsins.map((a,i)=>{
     const asinClean=(a.asin||'').trim().toUpperCase();
-    const amzUrl=asinClean?'https://www.amazon.co.uk/dp/'+asinClean+'?th=1':'';
-    const amzBtn=amzUrl?'<a href="'+amzUrl+'" target="_blank" class="asin-link" title="Open on Amazon UK">AMZ</a>':'<span class="asin-link-empty">AMZ</span>';
+    const amzUrl=asinClean?amzUrlFor(asinClean):'';
+    const amzBtn=amzUrl?'<a href="'+amzUrl+'" target="_blank" class="asin-link" title="Open on '+(settings.amazonDomain||'amazon.co.uk')+'">AMZ</a>':'<span class="asin-link-empty">AMZ</span>';
     return '<div class="asin-row">'
       +'<input type="text" value="'+esc(a.asin||'')+'" placeholder="ASIN e.g. B08XYZ1234" oninput="upA('+i+',&quot;asin&quot;,this.value);renderAsinList()">'
       +'<input class="note-i" type="text" value="'+esc(a.note||'')+'" placeholder="Note e.g. top seller, weak reviews..." oninput="upA('+i+',&quot;note&quot;,this.value)">'
@@ -2949,10 +3012,20 @@ function renderSettings(){
 
     <!-- GENERAL -->
     <div class="set-panel ${activeSetTab==='general'?'active':''}" id="set-panel-general">
-      <div class="set-sec"><div class="set-sh">Sourcing Methods</div><div class="set-sb">
-        <p style="font-size:12px;color:var(--t2);margin-bottom:12px">These appear in the sourcing method dropdown when adding an idea. Remove ones you never use, add your own.</p>
+      <div class="set-sec"><div class="set-sh">How I Found It — Sourcing Methods</div><div class="set-sb">
+        <p style="font-size:12px;color:var(--t2);margin-bottom:12px">These fill the "How did you find this idea?" dropdown when adding an idea. Add your own, or remove ones you never use — changes save when you hit Save Settings.</p>
         <div class="tag-list" id="src-tags"></div>
-        <div class="add-row"><input class="add-inp" id="src-new" placeholder="Add sourcing method..." onkeydown="if(event.key===&quot;Enter&quot;)addTag('sourcing')"><button class="btn sm" onclick="addTag('sourcing')">Add</button></div>
+        <div class="add-row"><input class="add-inp" id="src-new" placeholder="Add a way you find ideas (e.g. Instagram, Etsy, Reddit)..." onkeydown="if(event.key===&quot;Enter&quot;)addTag('sourcing')"><button class="btn sm" onclick="addTag('sourcing')">Add</button></div>
+      </div></div>
+      <div class="set-sec"><div class="set-sh">Amazon Marketplace</div><div class="set-sb">
+        <p style="font-size:12px;color:var(--t2);margin-bottom:12px">Which Amazon site your ASIN links point to — used on cards, in the ASIN list and in exports.</p>
+        <select class="set-inp" id="set_amazonDomain" style="width:100%;max-width:320px">
+          ${['amazon.co.uk','amazon.com','amazon.de','amazon.fr','amazon.es','amazon.it','amazon.ca','amazon.com.au','amazon.co.jp','amazon.in','amazon.nl','amazon.se','amazon.com.mx','amazon.com.br'].map(function(d){return '<option value="'+d+'" '+((settings.amazonDomain||'amazon.co.uk')===d?'selected':'')+'>'+d+'</option>';}).join('')}
+        </select>
+      </div></div>
+      <div class="set-sec"><div class="set-sh">Export Defaults</div><div class="set-sb">
+        <p style="font-size:12px;color:var(--t2);margin-bottom:10px">Which sections are included when you export. You can also flip these on the fly inside the Export window — either way it's remembered.</p>
+        <div class="export-sections" id="settings-export-sections"></div>
       </div></div>
       <div class="set-sec"><div class="set-sh">Score Labels</div><div class="set-sb">
         <div style="display:flex;flex-direction:column;gap:8px">
@@ -2983,19 +3056,42 @@ function renderSettings(){
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
         <div>
           <div style="font-size:14px;font-weight:600;color:var(--t1);margin-bottom:3px">Checklist Questions</div>
-          <div style="font-size:12px;color:var(--t2)">Edit questions, hints, point values. Toggle off ones you don't want.</div>
+          <div style="font-size:12px;color:var(--t2)">Add, edit or remove questions, set their hints, importance and point weighting, and toggle a notes box on any question.</div>
         </div>
         <button class="btn sm primary" onclick="saveClSettings()">Save Changes</button>
       </div>
+      <div class="set-sec" style="margin-bottom:14px"><div class="set-sb" style="padding-top:14px">
+        <div style="font-size:12px;color:var(--t2);line-height:1.6">
+          <b style="color:var(--t1)">How the score works.</b> Each answered question adds its points when the answer is good.
+          <b style="color:var(--green)">Critical</b> = 10pts, <b style="color:var(--amber)">Important</b> = 7, <b>Medium</b> = 5, <b style="color:var(--t3)">Low</b> = 2, <b>N/A</b> = tracked but not scored.
+          The final % is points earned ÷ points available, so turning questions on/off and changing their importance directly reshapes the score.
+          Search volume, price and competition are scored separately under the <b>Scoring Thresholds</b> tab.
+        </div>
+      </div></div>
       <div id="cl-edit-list"></div>
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <button class="btn primary" onclick="addClQuestion()">+ Add question</button>
+        <button class="btn" onclick="saveClSettings()">Save Changes</button>
+        <button class="btn ghost" onclick="if(confirm('Reset the checklist questions back to the built-in defaults? Your custom questions will be removed.')){settings.checklist=JSON.parse(JSON.stringify(DEF.checklist));persist();renderSettings();showFlash('Checklist reset ✓');}">Reset to defaults</button>
+      </div>
     </div>
 
     <!-- SCORING -->
     <div class="set-panel ${activeSetTab==='scoring'?'active':''}" id="set-panel-scoring">
       <div style="margin-bottom:14px">
-        <div style="font-size:14px;font-weight:600;color:var(--t1);margin-bottom:3px">Scoring Thresholds</div>
-        <div style="font-size:12px;color:var(--t2)">Control what values count as green, amber, or red for numeric fields.</div>
+        <div style="font-size:14px;font-weight:600;color:var(--t1);margin-bottom:3px">Scoring Weights &amp; Thresholds</div>
+        <div style="font-size:12px;color:var(--t2)">Control how much each area is worth, and what values count as green / amber / red.</div>
       </div>
+      <div class="set-sec"><div class="set-sh">How much each area is worth</div><div class="set-sb">
+        <p style="font-size:12px;color:var(--t2);margin-bottom:12px">These are the maximum points for the market side of the score. Your checklist questions add on top. Raise a number to make that area matter more. <b>Market total: <span id="weightTotal">${(settings.weights.sv+settings.weights.ctx+settings.weights.price)}</span> pts</b> · checklist adds <b>${(settings.checklist||DEF.checklist).filter(function(i){return i.on!==false&&i.importance!=='na';}).reduce(function(a,i){return a+(i.pts||0);},0)} pts</b>.</p>
+        <div class="set-row"><div style="flex:1"><div class="set-rn">Search Volume</div><div class="set-rs">Raw demand — how many people search for it</div></div><input class="set-inp" type="number" id="tw_sv" min="0" max="60" value="${settings.weights.sv}" oninput="updateWeightTotal()"></div>
+        <div class="set-row"><div style="flex:1"><div class="set-rn">Demand vs Competition</div><div class="set-rs">How winnable the demand is (SV + competitors + comp sales)</div></div><input class="set-inp" type="number" id="tw_ctx" min="0" max="60" value="${settings.weights.ctx}" oninput="updateWeightTotal()"></div>
+        <div class="set-row"><div style="flex:1"><div class="set-rn">Price / Margin</div><div class="set-rs">Sale price as a proxy for margin room</div></div><input class="set-inp" type="number" id="tw_price" min="0" max="60" value="${settings.weights.price}" oninput="updateWeightTotal()"></div>
+        <div style="display:flex;gap:10px;margin-top:12px">
+          <button class="btn primary" onclick="saveWeights()">Save Weights</button>
+          <button class="btn ghost" onclick="settings.weights=JSON.parse(JSON.stringify(DEF.weights));persist();renderSettings();showFlash('Weights reset ✓');">Reset to defaults</button>
+        </div>
+      </div></div>
       <div class="set-sec"><div class="set-sh">Search Volume</div><div class="set-sb">
         <div class="set-row"><div style="flex:1"><div class="set-rn">Green at or above</div><div class="set-rs">Strong demand (3,000+)</div></div><input class="set-inp" type="number" id="ts_sv_green" value="${settings.thresholds.sv_green}"></div>
         <div class="set-row"><div style="flex:1"><div class="set-rn">Amber at or above</div><div class="set-rs">Viable but not ideal (1,000–2,999)</div></div><input class="set-inp" type="number" id="ts_sv_amber" value="${settings.thresholds.sv_amber}"></div>
@@ -3036,6 +3132,7 @@ function renderSettings(){
     </div>
   `;
   renderTags('src-tags','sourcing');
+  renderExportSections();
   if(activeSetTab==='checklist')renderClEditList();
 }
 
@@ -3069,6 +3166,7 @@ function renderClEditList(){
           <div class="cl-toggle-track"></div>
           <div class="cl-toggle-thumb"></div>
         </label>
+        <button class="btn sm ghost" style="color:var(--red);padding:4px 10px;margin-left:2px" title="Delete this question" onclick="deleteClQuestion(${i})">Delete</button>
       </div>
 
       <div style="margin-bottom:10px">
@@ -3099,6 +3197,13 @@ function renderClEditList(){
             Good answer = No (inverted)
           </label>
         </div>
+        <div class="cl-edit-field">
+          <div class="cl-edit-label">Notes box</div>
+          <label class="inv-toggle">
+            <input type="checkbox" ${item.note?'checked':''} onchange="updateClItem(${i},'note',this.checked)">
+            Show a notes box on this question
+          </label>
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -3125,6 +3230,28 @@ function updateClItem(i,field,val){
   settings.checklist[i][field]=val;
 }
 
+function addClQuestion(){
+  if(!settings.checklist)settings.checklist=JSON.parse(JSON.stringify(DEF.checklist));
+  const id='q_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  settings.checklist.push({id,q:'New question?',h:'Add a hint explaining what to look for.',inv:false,pts:5,importance:'medium',on:true,note:false});
+  renderClEditList();
+  // scroll to and focus the new question so it's ready to edit
+  setTimeout(()=>{
+    const el=document.getElementById('cl-edit-'+(settings.checklist.length-1));
+    if(el){el.scrollIntoView({behavior:'smooth',block:'center'});const inp=el.querySelector('.cl-edit-inp');if(inp){inp.focus();inp.select&&inp.select();}}
+  },60);
+}
+
+function deleteClQuestion(i){
+  if(!settings.checklist)return;
+  const item=settings.checklist[i];
+  if(!confirm('Delete the question "'+((item&&item.q)||'this question')+'"?\n\nIt will be removed from the scoring and from the Add-Idea checklist. Existing saved answers are kept but no longer counted.'))return;
+  settings.checklist.splice(i,1);
+  persist();
+  renderClEditList();
+  showFlash('Question deleted ✓');
+}
+
 function saveClSettings(){
   persist();
   showFlash('Checklist saved ✓');
@@ -3147,7 +3274,34 @@ function saveSettings(){
   ['sv_green','sv_amber','price_green','price_amber','tcs_green','tcs_amber','nc_green','nc_amber'].forEach(k=>{
     const e=document.getElementById('ts_'+k);if(e)settings.thresholds[k]=parseFloat(e.value)||0;
   });
+  const dom=document.getElementById('set_amazonDomain');if(dom)settings.amazonDomain=dom.value||'amazon.co.uk';
   persist();showFlash('Settings saved ✓');
+}
+function amzUrlFor(asin){return 'https://www.'+(settings.amazonDomain||'amazon.co.uk')+'/dp/'+String(asin||'').trim().toUpperCase()+'?th=1';}
+function checkDupName(){
+  const el=document.getElementById('dupWarn');if(!el)return;
+  const v=(document.getElementById('f_name')?.value||'').trim().toLowerCase();
+  if(v.length<3){el.style.display='none';el.innerHTML='';return;}
+  const tokens=v.split(/[^a-z0-9]+/).filter(t=>t.length>2);
+  const hits=ideas.filter(x=>x.id!==editId&&!x.isSample&&x.name).filter(x=>{
+    const nm=x.name.toLowerCase();
+    return nm===v||tokens.some(t=>nm.includes(t));
+  }).slice(0,3);
+  if(!hits.length){el.style.display='none';el.innerHTML='';return;}
+  el.style.display='block';
+  el.innerHTML='⚠ Looks like: '+hits.map(h=>'<b>'+esc(h.name)+'</b>'+(h.inPipeline?' (in pipeline)':'')).join(', ')+' — make sure you’re not researching the same product twice.';
+}
+function updateWeightTotal(){
+  var g=function(id){var e=document.getElementById(id);return e?parseInt(e.value)||0:0;};
+  var t=g('tw_sv')+g('tw_ctx')+g('tw_price');
+  var el=document.getElementById('weightTotal');if(el)el.textContent=t;
+}
+function saveWeights(){
+  if(!settings.weights)settings.weights=JSON.parse(JSON.stringify(DEF.weights));
+  [['tw_sv','sv'],['tw_ctx','ctx'],['tw_price','price']].forEach(function(p){
+    var e=document.getElementById(p[0]);if(e){var v=parseInt(e.value);settings.weights[p[1]]=isNaN(v)||v<0?0:v;}
+  });
+  persist();renderDash();showFlash('Scoring weights saved ✓');
 }
 function saveStageDurations(){
   if(!settings.stageDays)settings.stageDays={};
@@ -3160,6 +3314,7 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 document.addEventListener('keydown',e=>{
   const modalOpen=document.getElementById('overlay').classList.contains('open');
   if(e.key==='Escape'){
+    if(document.getElementById('exportOverlay').classList.contains('open')){closeExport();return;}
     if(document.getElementById('delOverlay').classList.contains('open')){closeDelModal();return;}
     if(document.getElementById('bulkOverlay').classList.contains('open')){closeBulkModal();return;}
     if(modalOpen){closeModal();return;}
@@ -3561,6 +3716,9 @@ function buildExportOpts(){
     var el=document.querySelector('.export-opt[data-mode="selected"]');
     if(el)el.classList.add('active');
   }
+  var titleEl=document.getElementById('exportTitle');
+  if(titleEl)titleEl.textContent=(exportCustomIds&&exportCustomIds.length===1)?'Export This Idea':'Export Ideas';
+  renderExportSections();
   updateExportPreview();
 }
 
@@ -3601,11 +3759,72 @@ function updateExportPreview(){
   const ep=document.getElementById('exportPreview');
   if(ep.tagName==='TEXTAREA')ep.value=text;
   else ep.textContent=text;
+  const lbl=document.getElementById('exportCountLbl');
+  if(lbl)lbl.textContent=toExport.length?'· '+toExport.length+' idea'+(toExport.length!==1?'s':''):'· nothing selected';
+}
+
+// ── Export section toggles (what to include) ─────────────────
+const EXPORT_SECTIONS=[
+  {key:'header',label:'Score & rank'},
+  {key:'found',label:'How I found it'},
+  {key:'market',label:'Market numbers'},
+  {key:'asins',label:'ASINs'},
+  {key:'links',label:'Amazon links'},
+  {key:'proscons',label:'Pros & cons'},
+  {key:'tocheck',label:'To-check list'},
+  {key:'qnotes',label:'Question notes'},
+  {key:'mytake',label:'My take'},
+];
+function exportSectionsHTML(){
+  const EO=settings.exportOpts||DEF.exportOpts;
+  return EXPORT_SECTIONS.map(function(s){
+    const on=EO[s.key]!==false;
+    return '<span class="export-sec-chip '+(on?'on':'')+'" onclick="toggleExportSection(\''+s.key+'\')"><span class="esc-tick">✓</span>'+s.label+'</span>';
+  }).join('');
+}
+function renderExportSections(){
+  ['exportSections','settings-export-sections'].forEach(function(id){
+    const el=document.getElementById(id);if(el)el.innerHTML=exportSectionsHTML();
+  });
+}
+function toggleExportSection(key){
+  if(!settings.exportOpts)settings.exportOpts=JSON.parse(JSON.stringify(DEF.exportOpts));
+  settings.exportOpts[key]=settings.exportOpts[key]===false?true:false;
+  persist();
+  renderExportSections();
+  updateExportPreview();
+}
+function exportSelectAllBands(){
+  document.querySelectorAll('.export-opt').forEach(function(el){
+    var m=el.getAttribute('data-mode');
+    if(m&&!selectedExportOpts.has(m))selectExportMode(m);
+  });
+}
+function exportClearBands(){
+  selectedExportOpts.clear();
+  document.querySelectorAll('.export-opt').forEach(function(el){el.classList.remove('active');});
+  exportCustomIds=[];exportMode='custom';
+  updateExportPreview();
+}
+function exportSingle(id){openExport('single',[id]);}
+function downloadExport(){
+  const ep=document.getElementById('exportPreview');
+  const text=ep?(ep.tagName==='TEXTAREA'?ep.value:ep.textContent):'';
+  if(!text||text==='No ideas to export.'){showFlash('Nothing selected to export');return;}
+  const date=new Date().toISOString().slice(0,10);
+  const blob=new Blob([text],{type:'text/plain'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='pl-ideas-export-'+date+'.txt';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  showFlash('Downloaded ✓');
 }
 
 function generateExportText(list){
   if(!list.length)return 'No ideas to export.';
   const cl=settings.checklist||DEF.checklist;
+  const EO=settings.exportOpts||DEF.exportOpts;
+  const domain=(settings.amazonDomain||'amazon.co.uk').replace(/^https?:\/\//,'').replace(/\/+$/,'');
   let out='';
   if(list.length>1) out+='PL SOURCING — '+list.length+' IDEAS\n\n';
 
@@ -3617,31 +3836,37 @@ function generateExportText(list){
     const rankPos=ranked.findIndex(function(x){return x.id===n.id;})+1;
     const num=list.length>1?(idx+1)+'. ':'';
 
-    // Line 1: name — status — score — rank — source
-    out+=num+(n.name||'Unnamed').toUpperCase()+' — '+statusLabel(sc.status)+' — '+sc.pct+'% — #'+rankPos+'/'+ideas.length+' — Source: '+(n.sourcing||'Not specified')+'\n';
-
-    // Notes
-    if(n.myThoughts&&n.myThoughts.trim()){
-      out+='Notes: '+n.myThoughts.trim()+'\n';
+    // Line 1: name — status — score — rank
+    if(EO.header!==false){
+      out+=num+(n.name||'Unnamed').toUpperCase()+' — '+statusLabel(sc.status)+' — '+sc.pct+'% — #'+rankPos+'/'+ideas.length+'\n';
+    } else {
+      out+=num+(n.name||'Unnamed').toUpperCase()+'\n';
     }
+    // How it was found
+    if(EO.found!==false) out+='How I found it: '+(n.sourcing||'Not specified')+'\n';
 
     // Market
-    var mkt=[];
-    if(sv)      mkt.push('SV '+Number(sv).toLocaleString());
-    if(n.price) mkt.push('£'+n.price);
-    if(n.tcs)   mkt.push(n.tcs+' comp sales/mo');
-    if(n.ncomp) mkt.push(n.ncomp+' competitors');
-    if(mkt.length) out+='Market: '+mkt.join(' · ')+'\n';
-    if(n.ncomp_note&&n.ncomp_note.trim()) out+='Notes: '+n.ncomp_note.trim()+'\n';
+    if(EO.market!==false){
+      var mkt=[];
+      if(sv)      mkt.push('SV '+Number(sv).toLocaleString());
+      if(n.price) mkt.push('£'+n.price);
+      if(n.tcs)   mkt.push(n.tcs+' comp sales/mo');
+      if(n.ncomp) mkt.push(n.ncomp+' competitors');
+      if(n.tiktokSales) mkt.push('TikTok ~'+n.tiktokSales+'/mo');
+      if(mkt.length) out+='Market: '+mkt.join(' · ')+'\n';
+      if(n.ncomp_note&&n.ncomp_note.trim()) out+='Competitor notes: '+n.ncomp_note.trim()+'\n';
+    }
 
-    // ASINs
-    validAsins.forEach(function(a){
-      var asin=a.asin.trim().toUpperCase();
-      out+='ASIN: '+asin+(a.note&&a.note.trim()?' ('+a.note.trim()+')':'')+'\n';
-      out+='Amazon Link:\nhttps://www.amazon.co.uk/dp/'+asin+'?th=1\n';
-    });
+    // ASINs (+ optional Amazon links)
+    if(EO.asins!==false){
+      validAsins.forEach(function(a){
+        var asin=a.asin.trim().toUpperCase();
+        out+='ASIN: '+asin+(a.note&&a.note.trim()?' ('+a.note.trim()+')':'')+'\n';
+        if(EO.links!==false) out+='Amazon Link: https://www.'+domain+'/dp/'+asin+'?th=1\n';
+      });
+    }
 
-    // Checklist
+    // Checklist — labels come from the question text so custom questions work too
     var scored=cl.filter(function(item){return item.on!==false&&item.importance!=='na'&&item.pts!==0;});
     var goodItems=scored.filter(function(item){var v=n[item.id];return v&&(item.inv?v==='no':v==='yes');});
     var badItems=scored.filter(function(item){var v=n[item.id];return v&&(item.inv?v==='yes':v==='no');});
@@ -3650,14 +3875,24 @@ function generateExportText(list){
     var gl={reviews:'Reviews <500',improve:'Can improve',amzsell:'Amazon not selling',chinese:'Not Chinese dominated',better:'Can differentiate',ads:'Light on ads',comply:'Compliance clear'};
     var bl={reviews:'Reviews strong',improve:'No improvement angle',amzsell:'Amazon selling',chinese:'Chinese dominated',better:'No differentiation',ads:'Heavy ads',comply:'Compliance complex'};
 
-    if(goodItems.length){
-      out+='Pros: '+goodItems.map(function(i){return gl[i.id]||i.q.replace(/[?]+$/,'');}).join(' · ')+'\n';
-      var imp=goodItems.find(function(i){return i.id==='improve';});
-      if(imp&&n.improve_note&&n.improve_note.trim()) out+='Improvement angle: '+n.improve_note.trim()+'\n';
+    if(EO.proscons!==false){
+      if(goodItems.length) out+='Pros: '+goodItems.map(function(i){return gl[i.id]||i.q.replace(/[?]+$/,'');}).join(' · ')+'\n';
+      if(badItems.length)  out+='Cons: '+badItems.map(function(i){return bl[i.id]||i.q.replace(/[?]+$/,'');}).join(' · ')+'\n';
     }
-    if(badItems.length)  out+='Cons: '+badItems.map(function(i){return bl[i.id]||i.q.replace(/[?]+$/,'');}).join(' · ')+'\n';
-    if(openItems.length) out+='To check: '+openItems.map(function(i){return i.q.replace(/[?]+$/,'');}).join(' · ')+'\n';
-    if(n.tiktokSales)    out+='TikTok: ~'+n.tiktokSales+'/mo\n';
+    if(EO.tocheck!==false && openItems.length) out+='To check: '+openItems.map(function(i){return i.q.replace(/[?]+$/,'');}).join(' · ')+'\n';
+
+    // Per-question notes (improvement angle + any other question with a notes box)
+    if(EO.qnotes!==false){
+      cl.forEach(function(item){
+        var nv=n[item.id+'_note'];
+        if(!nv||!nv.trim())return;
+        var lbl=item.id==='improve'?'Improvement angle':item.q.replace(/[?]+$/,'').trim();
+        out+=lbl+': '+nv.trim()+'\n';
+      });
+    }
+
+    // My own take on the idea — the free-text thoughts
+    if(EO.mytake!==false && n.myThoughts&&n.myThoughts.trim()) out+='My take: '+n.myThoughts.trim()+'\n';
 
     if(list.length>1) out+='\n';
   });
@@ -5598,7 +5833,7 @@ html,body{background:radial-gradient(950px 540px at 50% -210px,rgba(78,140,255,.
 
 /* Ranking: make it a clear decision surface, not a plain list. */
 #rankView{padding-top:1px}.rank-command{display:grid;grid-template-columns:1.4fr repeat(3,minmax(145px,1fr));gap:10px;margin:0 0 13px}.rank-command-main,.rank-command-stat{border:1px solid #233c5e;border-radius:13px;background:linear-gradient(145deg,#101b2b,#0a1018);padding:13px 14px;min-height:86px}.rank-command-main{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;background:linear-gradient(118deg,#163975,#0d1626)}.rank-kicker{font:850 9px var(--mono);letter-spacing:.11em;text-transform:uppercase;color:#9dc1ff}.rank-command-main h2{font-size:18px;letter-spacing:-.035em;color:#f0f6ff;margin:5px 0 3px}.rank-command-main p{font-size:12px;line-height:1.45;color:#b5c7e6;margin:0;max-width:480px}.rank-command-stat span{display:block;color:#8095b3;font:800 9px var(--mono);letter-spacing:.09em;text-transform:uppercase}.rank-command-stat b{display:block;color:#eff5ff;font-size:20px;letter-spacing:-.055em;margin-top:8px}.rank-command-stat small{display:block;color:#8195b0;font-size:11px;margin-top:4px}.rank-command-stat.good b{color:#37de93}.rank-command-stat.potential b{color:#ffc140}.rank-command-stat.avg b{color:#9bbcff}
-#rankView>.toolbar{position:sticky!important;top:0;z-index:16;padding:10px!important;margin:0 -10px 10px!important;background:rgba(6,9,14,.93)!important;backdrop-filter:blur(15px);border-bottom:1px solid rgba(31,48,73,.86)!important}.rank-head{grid-template-columns:54px 1fr 210px 116px!important;gap:13px!important;padding:0 16px 9px!important;color:#7187a5!important}.rank-item{grid-template-columns:54px 1fr 210px 116px!important;gap:13px!important;padding:13px 16px!important;border:1px solid #243d61!important;border-radius:12px!important;background:var(--s1)!important;box-shadow:0 8px 18px rgba(0,0,0,.12)!important;margin-bottom:7px!important}.rank-item:hover{border-color:#5787e8!important;background:var(--s1)!important}.rank-item::before{width:3px!important}.ri-pos{font-size:17px!important;color:#8193ab!important}.ri-main{min-width:0}.ri-name{font-size:14.5px!important;font-weight:820!important}.ri-why{font-size:11.5px!important;color:#92a4bd!important}.ri-meta-tags{margin-top:5px!important}.ri-m{font-size:10px!important;padding:5px 7px;border:1px solid #2a4365;border-radius:7px;background:#101c2e;text-align:center!important}.ri-m b{display:block;color:#e6effb;font-size:12px;margin-top:2px}.ri-bar{display:flex;flex-direction:column;justify-content:center;gap:6px}.ri-bt{height:7px!important;border-radius:999px!important;background:#1a2739!important}.ri-bf{height:7px!important;border-radius:999px!important}.ri-pv{font-size:17px!important;letter-spacing:-.05em}.rank-item .btn.success{background:#155e3b!important;border-color:#2ca56b!important;color:#c9ffe1!important}.rank-item .btn.success:hover{background:#1a7b4e!important}
+#rankView>.toolbar{position:sticky!important;top:0;z-index:16;padding:10px!important;margin:0 -10px 10px!important;background:rgba(6,9,14,.93)!important;backdrop-filter:blur(15px);border-bottom:1px solid rgba(31,48,73,.86)!important}.rank-head{grid-template-columns:54px minmax(0,1fr) 210px 122px 116px!important;gap:13px!important;padding:0 16px 9px!important;color:#7187a5!important;align-items:center}.rank-item{grid-template-columns:54px minmax(0,1fr) 210px 122px 116px!important;gap:13px!important;padding:13px 16px!important;border:1px solid #243d61!important;border-radius:12px!important;background:var(--s1)!important;box-shadow:0 8px 18px rgba(0,0,0,.12)!important;margin-bottom:7px!important;align-items:center!important}.rank-item:hover{border-color:#5787e8!important;background:var(--s1)!important}.rank-item::before{width:3px!important}.ri-pos{font-size:17px!important;color:#8193ab!important}.ri-main{min-width:0}.ri-name{font-size:14.5px!important;font-weight:820!important;overflow:hidden;text-overflow:ellipsis}.ri-why{font-size:11.5px!important;color:#92a4bd!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ri-metrics{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap;min-width:0}.ri-act{display:flex;justify-content:flex-end}.ri-meta-tags{margin-top:5px!important}.ri-m{font-size:10px!important;padding:5px 7px;border:1px solid #2a4365;border-radius:7px;background:#101c2e;text-align:center!important;white-space:nowrap}.ri-m b{display:block;color:#e6effb;font-size:12px;margin-top:2px}.ri-bar{display:flex;flex-direction:column;justify-content:center;gap:6px}.ri-bt{height:7px!important;border-radius:999px!important;background:#1a2739!important}.ri-bf{height:7px!important;border-radius:999px!important}.ri-pv{font-size:17px!important;letter-spacing:-.05em;text-align:right}.rank-item .btn.success{background:#155e3b!important;border-color:#2ca56b!important;color:#c9ffe1!important;width:100%}.rank-item .btn.success:hover{background:#1a7b4e!important}
 
 /* Forecast page: concise planning data with no false precision. */
 #pane-forecast{max-width:1720px!important}.forecast-note{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:10px 13px;margin:0 0 13px;border:1px solid #2c5291;border-radius:13px;background:linear-gradient(110deg,rgba(24,66,137,.42),rgba(10,18,29,.93))}.forecast-note h3{font-size:14px;margin:0 0 3px;color:#eff6ff}.forecast-note p{font-size:12px;line-height:1.5;color:#b0c4e2;margin:0}.forecast-note b{color:#eaf3ff}.forecast-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:13px}.forecast-kpi{min-height:105px;border:1px solid #233e61;border-radius:13px;padding:10px 13px;background:linear-gradient(145deg,#101a29,#0a1018)}.forecast-kpi span{display:block;color:#91a4c0;font:850 9px var(--mono);letter-spacing:.1em;text-transform:uppercase}.forecast-kpi b{display:block;margin-top:11px;font-size:27px;letter-spacing:-.055em;color:#eff6ff}.forecast-kpi small{display:block;margin-top:4px;color:#8295ae;font-size:11px}.forecast-kpi.live{border-color:#23734d;background:linear-gradient(145deg,#0d3524,#081810)}.forecast-kpi.live b{color:#5ceaa3}.forecast-kpi.pipe{border-color:#315da5;background:linear-gradient(145deg,#102b59,#091327)}.forecast-kpi.pipe b{color:#99bcff}.forecast-kpi.total{border-color:#6944bd;background:linear-gradient(145deg,#2b1760,#110b26)}.forecast-kpi.total b{color:#c3abff}.forecast-kpi.missing{border-color:#7b5d18;background:linear-gradient(145deg,#332504,#151005)}.forecast-kpi.missing b{color:#ffca55}.forecast-kpi.products{border-color:#226b74;background:linear-gradient(145deg,#0b3439,#071619)}.forecast-kpi.products b{color:#59dce4}.forecast-section{border:1px solid #233d5e;border-radius:13px;overflow:hidden;background:#0a111b;margin-bottom:13px}.forecast-section-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 15px;border-bottom:1px solid #223953;background:#101a28}.forecast-section-head h2{font-size:12px;font-weight:850;letter-spacing:.02em;margin:0;color:#edf5ff}.forecast-section-head p{font-size:11px;color:#8599b5;margin:3px 0 0}.forecast-table-scroll{overflow:auto}.forecast-tbl{width:100%;border-collapse:collapse;min-width:930px}.forecast-tbl th{padding:10px 12px;background:#0d1723;color:#7f94b3;font:850 9px var(--mono);letter-spacing:.08em;text-align:right;text-transform:uppercase;white-space:nowrap}.forecast-tbl th:first-child,.forecast-tbl th:nth-child(2){text-align:left}.forecast-tbl td{padding:12px;border-top:1px solid #1e314a;color:#c8d7ec;font-size:12px;text-align:right;white-space:nowrap}.forecast-tbl td:first-child,.forecast-tbl td:nth-child(2){text-align:left}.forecast-tbl tr{cursor:pointer}.forecast-tbl tr:hover td{background:#101d2e}.forecast-name{font-weight:820;color:#eef5ff}.forecast-stage{display:inline-flex;padding:4px 7px;border:1px solid #29486f;border-radius:6px;background:#101e33;color:#a9c7f5;font:750 9px var(--mono);letter-spacing:.05em;text-transform:uppercase}.forecast-target{color:#b8c8df}.forecast-net{font-weight:840;color:#5deba5}.forecast-missing{color:#ffcb5b;font-size:11px}.forecast-edit{height:28px;border:1px solid #315d9e;border-radius:7px;background:#122a51;color:#b8d5ff;font:800 10px var(--sans);cursor:pointer;padding:0 9px}.forecast-edit:hover{background:#1a3b72;color:#fff}.forecast-empty{padding:26px 16px;color:#8aa0bb;font-size:12px;text-align:center}.forecast-empty b{display:block;color:#e7f0fc;font-size:14px;margin-bottom:4px}
@@ -5609,7 +5844,7 @@ html,body{background:radial-gradient(950px 540px at 50% -210px,rgba(78,140,255,.
 /* Detail surfaces benefit from a little heavier typography. */
 #pane-settings .set-sh,#pane-pl .pl-goals-eyebrow{font-weight:850!important;letter-spacing:.1em!important}
 @media(max-width:1180px){.rank-command{grid-template-columns:1fr 1fr}.rank-command-main{grid-column:1/-1}.forecast-kpis{grid-template-columns:repeat(3,1fr)}.kpi-rules-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:720px){.rank-command{grid-template-columns:1fr}.rank-command-main{grid-column:auto;flex-direction:column;align-items:flex-start}.rank-head{display:none!important}.rank-item{grid-template-columns:40px 1fr 100px!important;padding:12px!important}.rank-item>div:nth-child(3){grid-column:2/4;justify-content:flex-start!important;flex-wrap:wrap}.rank-item .ri-bar{grid-column:3;grid-row:1/3}.forecast-kpis{grid-template-columns:1fr 1fr}.forecast-note{flex-direction:column}.kpi-rules-grid{grid-template-columns:1fr}.page-notes-compose{grid-template-columns:1fr}.page-notes-compose button{width:100%}}
+@media(max-width:720px){.rank-command{grid-template-columns:1fr}.rank-command-main{grid-column:auto;flex-direction:column;align-items:flex-start}.rank-head{display:none!important}.rank-item{display:grid!important;grid-template-columns:36px 1fr auto!important;grid-template-areas:'pos main bar' 'pos metrics metrics' 'pos act act'!important;gap:8px 10px!important;padding:12px!important}.rank-item>.ri-pos{grid-area:pos}.rank-item>.ri-main{grid-area:main}.rank-item>.ri-metrics{grid-area:metrics;justify-content:flex-start!important}.rank-item>.ri-act{grid-area:act;justify-content:flex-start!important}.rank-item>.ri-bar{grid-area:bar}.rank-item .btn.success{width:auto!important}.forecast-kpis{grid-template-columns:1fr 1fr}.forecast-note{flex-direction:column}.kpi-rules-grid{grid-template-columns:1fr}.page-notes-compose{grid-template-columns:1fr}.page-notes-compose button{width:100%}}
 </style>
 <script id="portfolio-ranking-notes-v5-script">
 (function(){
